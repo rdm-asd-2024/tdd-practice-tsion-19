@@ -1,0 +1,5 @@
+x_0 = Input()
+x_1 = Input()
+x_2 = And(x_0, x_1)
+x_3 = Not(x_2)
+x_4 = Output(x_3)

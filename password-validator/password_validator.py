@@ -5,7 +5,6 @@ import csv
 class PasswordValidator:
     def __init__(self, custom_validators=None):
         self.custom_validators = custom_validators if custom_validators else []
-    
     def is_valid(self, password):
         # Check length
         if not 8 <= len(password) <= 16:

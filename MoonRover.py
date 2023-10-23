@@ -1,70 +1,98 @@
 class MoonRover:
-    def __init__(self, grid_size):
-        self.grid = [[0] * grid_size for _ in range(grid_size)]
-        self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
-        self.x, self.y = 0, 0  # Initial position
-        self.direction = 0  # Initial direction (right)
-        self.route = []  # To store the route
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+        self.direction = 'N'  # Start by facing North
+        self.commands = {
+            'R': self.rotate_right,
+            'L': self.rotate_left,
+            'U': self.move_up,
+            'D': self.move_down
+        }
+        self.obstacles = set()  # You can add obstacle coordinates here
 
-    def move(self, command):
-        if command == 'R':
-            self.direction = (self.direction + 1) % 4  # Rotate right
-        elif command == 'L':
-            self.direction = (self.direction - 1) % 4  # Rotate left
-        elif command == 'U':
-            self._move_to(3)  # Move up
-        elif command == 'D':
-            self._move_to(2)  # Move down
-        elif command == 'F':
-            self._move_forward()
-        elif command == 'W':
-            self._move_backward()
+    def rotate_right(self):
+        if self.direction == 'N':
+            self.direction = 'E'
+        elif self.direction == 'E':
+            self.direction = 'S'
+        elif self.direction == 'S':
+            self.direction = 'W'
+        else:
+            self.direction = 'N'
+
+    def rotate_left(self):
+        if self.direction == 'N':
+            self.direction = 'W'
+        elif self.direction == 'W':
+            self.direction = 'S'
+        elif self.direction == 'S':
+            self.direction = 'E'
+        else:
+            self.direction = 'N'
+
+    def move_up(self):
+        if (self.x, self.y + 1) not in self.obstacles:
+            self.y += 1
+        else:
+            raise Exception("Obstacle in the way!")
+
+    def move_down(self):
+        if (self.x, self.y - 1) not in self.obstacles:
+            self.y -= 1
+        else:
+            raise Exception("Obstacle in the way!")
+
+    def execute_command(self, command):
+        if command in self.commands:
+            self.commands[command]()
         else:
             raise ValueError("Invalid command")
 
-    def _move_to(self, new_direction):
-        new_x, new_y = self.x + self.directions[new_direction][0], self.y + self.directions[new_direction][1]
-        if self._is_valid_move(new_x, new_y):
-            self.x, self.y = new_x, new_y
-            self.direction = new_direction
-            self.route.append((self.x, self.y))
-
-    def _move_forward(self):
-        new_x, new_y = self.x + self.directions[self.direction][0], self.y + self.directions[self.direction][1]
-        if self._is_valid_move(new_x, new_y):
-            self.x, self.y = new_x, new_y
-            self.route.append((self.x, self.y))
-
-    def _move_backward(self):
-        new_direction = (self.direction + 2) % 4  # Opposite direction
-        new_x, new_y = self.x + self.directions[new_direction][0], self.y + self.directions[new_direction][1]
-        if self._is_valid_move(new_x, new_y):
-            self.x, self.y = new_x, new_y
-            self.direction = new_direction
-            self.route.append((self.x, self.y))
-
-    def _is_valid_move(self, new_x, new_y):
-        if 0 <= new_x < len(self.grid) and 0 <= new_y < len(self.grid[0]) and self.grid[new_x][new_y] != 1:
-            return True
+    def switch_guide_system(self, system):
+        if system == 'FLFW':
+            self.commands = {
+                'R': self.rotate_right,
+                'L': self.rotate_left,
+                'F': self.move_forward,
+                'W': self.move_backward
+            }
         else:
-            raise Exception("Obstacle detected")
+            self.commands = {
+                'R': self.rotate_right,
+                'L': self.rotate_left,
+                'U': self.move_up,
+                'D': self.move_down
+            }
+
+    def move_forward(self):
+        if self.direction == 'N':
+            self.move_up()
+        elif self.direction == 'E':
+            self.move_right()
+        elif self.direction == 'S':
+            self.move_down()
+        else:
+            self.move_left()
+
+    def move_backward(self):
+        if self.direction == 'N':
+            self.move_down()
+        elif self.direction == 'E':
+            self.move_left()
+        elif self.direction == 'S':
+            self.move_up()
+        else:
+            self.move_right()
 
     def draw_route(self):
-        for i in range(len(self.grid)):
-            for j in range(len(self.grid[i])):
-                if (i, j) == (self.x, self.y):
-                    print('R', end=' ')
-                elif (i, j) in self.route:
-                    print('.', end=' ')
-                else:
-                    print(' ', end=' ')
-            print()
-rover = MoonRover(10)  # Assuming a 10x10 grid
-rover.move('F')
-rover.move('R')
-rover.move('F')
-rover.move('D')
-rover.move('F')
-rover.move('L')
-rover.move('F')
+        print(f"Rover's current position: ({self.x}, {self.y})")
+        print(f"Rover's current direction: {self.direction}")
+
+
+# Example usage:
+rover = MoonRover()
+rover.execute_command('R')
+rover.execute_command('U')
+rover.execute_command('L')
 rover.draw_route()
