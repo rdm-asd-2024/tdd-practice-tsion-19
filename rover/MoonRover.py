@@ -9,7 +9,7 @@ class MoonRover:
         if command == 'R':
             self.rotate_right()
         elif command == 'L':
-            self.rotate_left()
+            self.rotate_left() 
         elif command == 'U':
             self.move_up()
         elif command == 'D':
